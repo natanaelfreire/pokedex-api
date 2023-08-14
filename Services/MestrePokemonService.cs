@@ -122,7 +122,9 @@ namespace PokedexApi.Services
             {
                 var integracaoPokemon = await PokeApiIntegration.GetPokemonName(pokemonName);
 
-                pokemon = await _pokemonService.CreateAsync(new InputPokemonDTO {
+                if (integracaoPokemon != null)
+                {
+                    pokemon = await _pokemonService.CreateAsync(new InputPokemonDTO {
                     Base64 = integracaoPokemon.Base64,
                     Evolucoes = integracaoPokemon.Evolucoes,
                     IntegracaoId = integracaoPokemon.Id,
@@ -134,7 +136,10 @@ namespace PokedexApi.Services
                 },
                     verifica: false);
 
-                idPokemon = pokemon.Id;
+                    idPokemon = pokemon.Id;
+                }
+                else
+                    throw new Exception("Pokemon não encontrado");                
             }
             else
                 idPokemon = pokemon.Id;
