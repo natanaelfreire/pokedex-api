@@ -58,6 +58,7 @@ Execute alguma rota no Swagger para testar.
   "idade": 0,
   "cpf": "string"
 }
+```
 
 <code>DELETE</code> - <code>/api/v1/MestrePokemon/{id}</code> - <i>exclui um mestre pokemon</i>
 
