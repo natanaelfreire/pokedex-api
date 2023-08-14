@@ -11,6 +11,9 @@ namespace PokedexApi.Utils
         {
             var httpResponse = await _httpClient.GetAsync(url);
             string data = await httpResponse.Content.ReadAsStringAsync();
+
+            if (data == "Not Found") return default(T);
+            
             T parsedData = JsonSerializer.Deserialize<T>(data);
 
             return parsedData;

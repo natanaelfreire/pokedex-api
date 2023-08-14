@@ -12,8 +12,6 @@ namespace PokedexApi.Integrations.PokeApi
     public static class PokeApiIntegration
     {
         private const string BASE_URL = "https://pokeapi.co/api/v2/";
-        private const int MAX_NUMBER_OF_POKEMONS = 1010;
-
 
         private static List<string> PokemonEvolutions(Chain chain, List<string> evolutions = null)
         {
@@ -56,19 +54,23 @@ namespace PokedexApi.Integrations.PokeApi
             var url = BASE_URL + $"pokemon/{name}";
             var pokemon = await HttpRequestUtils.Get<PokemonModel>(url);
 
-            ResponsePokemonModel resp = new();
+            if (pokemon != null) {
+                ResponsePokemonModel resp = new();
 
-            resp.Id = pokemon.id;
-            resp.Nome = pokemon.name;
-            resp.Tipos = pokemon.types.Select(x => x.type.name).ToList();
-            resp.PontosVida = pokemon.stats.Where(x => x.stat.name == "hp").Select(x => x.base_stat).FirstOrDefault();
-            resp.PontosAtaque = pokemon.stats.Where(x => x.stat.name == "attack").Select(x => x.base_stat).FirstOrDefault();
-            resp.PontosDefesa = pokemon.stats.Where(x => x.stat.name == "defense").Select(x => x.base_stat).FirstOrDefault();
+                resp.Id = pokemon.id;
+                resp.Nome = pokemon.name;
+                resp.Tipos = pokemon.types.Select(x => x.type.name).ToList();
+                resp.PontosVida = pokemon.stats.Where(x => x.stat.name == "hp").Select(x => x.base_stat).FirstOrDefault();
+                resp.PontosAtaque = pokemon.stats.Where(x => x.stat.name == "attack").Select(x => x.base_stat).FirstOrDefault();
+                resp.PontosDefesa = pokemon.stats.Where(x => x.stat.name == "defense").Select(x => x.base_stat).FirstOrDefault();
 
-            resp.Base64 = await HttpRequestUtils.GetBase64FromURL(pokemon.sprites.front_default); 
-            resp.Evolucoes = await GetEvolutionsByPokemonId(pokemon.id);
+                resp.Base64 = await HttpRequestUtils.GetBase64FromURL(pokemon.sprites.front_default); 
+                resp.Evolucoes = await GetEvolutionsByPokemonId(pokemon.id);
 
-            return resp;
+                return resp;
+            }
+            else
+                return  null;            
         }
 
         public static async Task<List<string>> GetEvolutionsByPokemonId(int id)
@@ -84,34 +86,6 @@ namespace PokedexApi.Integrations.PokeApi
         {
             var url = BASE_URL + $"pokemon-species/{id}";
             var resp = await HttpRequestUtils.Get<PokemonSpeciesModel>(url);
-
-            return resp;
-        }
-
-        public static async Task<List<ResponsePokemonModel>> Get10RandomPokemons()
-        {
-            Random r = new Random();
-            var randomIds = new List<int>();
-            int i = 0;
-
-            while (i < 10)
-            {
-                int randomInt = r.Next(1, MAX_NUMBER_OF_POKEMONS);
-
-                if (!randomIds.Contains(randomInt))
-                {
-                    randomIds.Add(randomInt);
-                    i++;
-                }
-            }
-
-            var resp = new List<ResponsePokemonModel>();
-
-            foreach (var id in randomIds)
-            {
-                var randomPokemon = await GetPokemonById(id);
-                resp.Add(randomPokemon);
-            }
 
             return resp;
         }

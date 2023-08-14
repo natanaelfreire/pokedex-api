@@ -15,7 +15,7 @@ namespace PokedexApi.Services
     {
         private readonly Context _context;
 
-        private const int MAX_NUMBER_IDS_OF_POKEMONS = 1010;
+        private const int MAX_NUMBER_IDS_OF_POKEMONS = 800;
 
         public PokemonService(Context context)
         {
@@ -78,24 +78,28 @@ namespace PokedexApi.Services
         {
             nome = nome.Trim();
             nome = nome.ToLower();
-            
             var pokemon = await GetByNameAsync(nome);
 
             if (pokemon == null)
             {
                 var integracaoPokemon = await PokeApiIntegration.GetPokemonName(nome);
 
-                pokemon = await CreateAsync(new InputPokemonDTO {
-                    Base64 = integracaoPokemon.Base64,
-                    IntegracaoId = integracaoPokemon.Id,
-                    Nome = integracaoPokemon.Nome,
-                    PontosAtaque = integracaoPokemon.PontosAtaque,
-                    PontosDefesa = integracaoPokemon.PontosDefesa,
-                    PontosVida = integracaoPokemon.PontosVida,
-                    Evolucoes = integracaoPokemon.Evolucoes,
-                    Tipos = integracaoPokemon.Tipos,
-                },
-                    verifica: false);
+                if (integracaoPokemon != null)
+                {
+                    pokemon = await CreateAsync(new InputPokemonDTO {
+                        Base64 = integracaoPokemon.Base64,
+                        IntegracaoId = integracaoPokemon.Id,
+                        Nome = integracaoPokemon.Nome,
+                        PontosAtaque = integracaoPokemon.PontosAtaque,
+                        PontosDefesa = integracaoPokemon.PontosDefesa,
+                        PontosVida = integracaoPokemon.PontosVida,
+                        Evolucoes = integracaoPokemon.Evolucoes,
+                        Tipos = integracaoPokemon.Tipos,
+                    },
+                        verifica: false);
+                }
+                else
+                    throw new Exception("Pokemon não encontrado");                
             }
 
             return ConvertToDTO(pokemon);

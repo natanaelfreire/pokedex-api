@@ -113,6 +113,8 @@ namespace PokedexApi.Services
 
         public async Task<bool> CapturaPokemon(int id, string pokemonName)
         {
+            pokemonName = pokemonName.Trim();
+            pokemonName = pokemonName.ToLower();
             int idPokemon;
             var pokemon = await _pokemonService.GetByNameAsync(pokemonName);
 
